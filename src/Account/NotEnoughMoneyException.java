@@ -3,6 +3,6 @@ package Account;
 public class NotEnoughMoneyException extends Exception {
 
     public NotEnoughMoneyException() {
-        getStackTrace();
+        System.out.println("НЕДОСТАТОЧНО СРЕДСТВ");
     }
 }
