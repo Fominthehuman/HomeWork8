@@ -2,21 +2,21 @@ package Account;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class AccountManagment {
 
     AccountService startService = new AccountService();
     Scanner in = new Scanner(System.in);
-    FileController fileController = new FileController();
+    DbConnectController dbConnectController = new DbConnectController();
 
-    public AccountManagment() throws FileNotFoundException, UnknownAccountException {
+    public AccountManagment() throws FileNotFoundException, UnknownAccountException, SQLException {
     }
 
-    public void startAccountManagment() throws IOException, UnknownAccountException, NotEnoughMoneyException {
-
-        fileController.isFileExistChecker();
-        //fileController.getFileName();
+    public void startAccountManagment() throws IOException, UnknownAccountException, NotEnoughMoneyException, SQLException {
+        dbConnectController.getDBConnection();
+        dbConnectController.isDbExistChecker();
         System.out.println("Введите команду");
         String s = in.nextLine();
         String words[] = s.split(" ");

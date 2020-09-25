@@ -1,83 +1,44 @@
 package Account;
 
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 
 public class AccountService {
 
-    protected String accountInfo;
-    protected String accountInfo2;
+    //protected String accountInfo;
+    //protected String accountInfo2;
     protected int finalAmount;
     protected int finalAmount2;
 
-    public AccountService() throws FileNotFoundException, UnknownAccountException {
+    public AccountService() throws FileNotFoundException, UnknownAccountException, SQLException {
 
     }
 
-    FileController fileController = new FileController();
+    DbConnectController dbConnectController = new DbConnectController();
 
-    void balance(int accountId) throws UnknownAccountException, FileNotFoundException {
-        accountInfo = fileController.findAccountInFile(accountId);
-        if (accountInfo == null) {
-            throw new UnknownAccountException();
-        }
-        System.out.println("Id и balance: " + accountInfo);
+    void balance(int accountId) throws UnknownAccountException, FileNotFoundException, SQLException {
+        System.out.println(accountId + " " + dbConnectController.findAccountInDb(accountId));
     }
 
-    void withdraw(int accountId, int amount) throws NotEnoughMoneyException, UnknownAccountException, FileNotFoundException {
-        accountInfo = fileController.findAccountInFile(accountId);
-        if (accountInfo == null) {
-            throw new UnknownAccountException();
-        }
-
-        System.out.println("Id и balance до снятия: " + accountInfo);
-        String words[] = accountInfo.split(" ");
-        if (amount > (Integer.parseInt(words[1]))) {
-            throw new NotEnoughMoneyException();
-        }
-
-        finalAmount = Integer.parseInt(words[1]) - amount;
-        System.out.println("Id и итоговый balance: " + accountId + " " + finalAmount);
-        fileController.updateAccountInFile(accountId, finalAmount);
-        System.out.println("Информация об аккаунте обновлена");
+    void withdraw(int accountId, int amount) throws NotEnoughMoneyException, UnknownAccountException, FileNotFoundException, SQLException {
+        finalAmount = (dbConnectController.findAccountInDb(accountId) - amount);
+        dbConnectController.updateAccountInDb(accountId, finalAmount);
+        System.out.println("Balance " + accountId + ": " + finalAmount);
     }
 
-    void deposit(int accountId, int amount) throws FileNotFoundException, UnknownAccountException { //здесь NotEnoughMoneyException не нужен
-        accountInfo = fileController.findAccountInFile(accountId);
-        System.out.println("Id и balance до зачисления: " + accountInfo);
-        String words[] = accountInfo.split(" ");
-        finalAmount = Integer.parseInt(words[1]) + amount;
-        System.out.println("Id и итоговый balance: " + accountId + " " + finalAmount);
-        fileController.updateAccountInFile(accountId, finalAmount);
-        System.out.println("Информация об аккаунте обновлена");
+    void deposit(int accountId, int amount) throws FileNotFoundException, UnknownAccountException, SQLException { //здесь NotEnoughMoneyException не нужен
+        finalAmount = (dbConnectController.findAccountInDb(accountId) + amount);
+        dbConnectController.updateAccountInDb(accountId, finalAmount);
+        System.out.println("Balance " + accountId + ": " + finalAmount);
     }
 
-    void transfer(int fromAccountId, int toAccountId, int amount) throws NotEnoughMoneyException, UnknownAccountException, FileNotFoundException {
-        accountInfo = fileController.findAccountInFile(fromAccountId); // from
-        if (accountInfo == null) {
-            throw new UnknownAccountException();
-        }
-        System.out.println("Id и balance до списания: " + accountInfo);
-        String words[] = accountInfo.split(" ");
-        if (amount > (Integer.parseInt(words[1]))) {
-            throw new NotEnoughMoneyException();
-        }
-
-        finalAmount = Integer.parseInt(words[1]) - amount; // from
-        fileController.updateAccountInFile(fromAccountId, finalAmount);
-
-        accountInfo2 = fileController.findAccountInFile(toAccountId); // to
-        if (accountInfo2 == null) {
-            throw new UnknownAccountException();
-        }
-        System.out.println("Id и balance до зачисления: " + accountInfo2);
-        String words2[] = accountInfo2.split(" ");
-        finalAmount2 = Integer.parseInt(words2[1]) + amount; // to
-        fileController.updateAccountInFile(toAccountId, finalAmount2);
-
-        System.out.println("Информация об аккаунте обновлена");
-        System.out.println("Id и balance после списания: " + fromAccountId + " " + finalAmount);
-        System.out.println("Id и balance после зачисления: " + toAccountId + " " + finalAmount2);
-
+    void transfer(int fromAccountId, int toAccountId, int amount) throws NotEnoughMoneyException, UnknownAccountException, FileNotFoundException, SQLException {
+        finalAmount = (dbConnectController.findAccountInDb(fromAccountId) - amount);
+        finalAmount2 = (dbConnectController.findAccountInDb(toAccountId) + amount);
+        dbConnectController.updateAccountInDb(fromAccountId, finalAmount);
+        dbConnectController.updateAccountInDb(toAccountId, finalAmount2);
+        System.out.println("Balance " + fromAccountId + ": " + finalAmount);
+        System.out.println("Balance " + toAccountId + ": " + finalAmount2);
     }
 
 }
