@@ -1,6 +1,5 @@
 package Account;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -11,7 +10,7 @@ public class AccountManagment {
     Scanner in = new Scanner(System.in);
     DbConnectController dbConnectController = new DbConnectController();
 
-    public AccountManagment() throws FileNotFoundException, UnknownAccountException, SQLException {
+    public AccountManagment() throws UnknownAccountException, SQLException {
     }
 
     public void startAccountManagment() throws IOException, UnknownAccountException, NotEnoughMoneyException, SQLException {
