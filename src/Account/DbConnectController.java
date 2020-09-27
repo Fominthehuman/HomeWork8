@@ -11,46 +11,22 @@ public class DbConnectController {
     protected String userName;
     protected String userPass;
     protected String createTableSQL;
-    String selectTableSQL = "select * from xrg_item"; // длф теста
     protected String balanceSelect;
     protected String balanceUpdate;
+    protected String accountInsert;
 
     public DbConnectController() throws SQLException {
         urlHostname = "jdbc:postgresql://localhost/gkretail";
-        userName = "user";
-        userPass = "pass";
-        createTableSQL = "CREATE TABLE IF NOT EXISTS public.\"AccountsTest2\" " +
+        userName = "USER";
+        userPass = "PASS";
+        createTableSQL = "CREATE TABLE IF NOT EXISTS public.\"AccountsTest\" " +
                 "(\"accountId\" integer NOT NULL, " +
                 "amount double precision, " +
                 "PRIMARY KEY (\"accountId\"));";
         balanceSelect = "SELECT \"accountId\", amount FROM public.\"AccountsTest\" WHERE \"accountId\" = ";
         balanceUpdate = "UPDATE public.\"AccountsTest\" SET amount = ? where \"accountId\" = ?";
-
+        accountInsert = "Insert into public.\"AccountsTest\" (\"accountId\", amount) VALUES ( 3246, 20000)";
     }
-
-    /*public void dbConnection() throws IOException, SQLException {
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return;
-        }
-        System.out.println("PostgreSQL JDBC Driver successfully connected");
-        Connection connection = null;
-        try {
-            connection = DriverManager
-                    .getConnection(urlHostname, userName, userPass);
-        } catch (SQLException e) {
-            System.out.println("Connection Failed");
-            e.printStackTrace();
-            return;
-        }
-        if (connection != null) {
-            System.out.println("You successfully connected to database now");
-        } else {
-            System.out.println("Failed to make connection to database");
-        }
-    }*/
 
     public Connection getDBConnection() {
         Connection dbConnection = null;
@@ -68,8 +44,23 @@ public class DbConnectController {
         return dbConnection;
     }
 
-    public void isDbExistChecker() throws IOException, SQLException {
-
+    public void isDbExistChecker() throws SQLException {
+        try {
+            Connection dbConnection = getDBConnection();
+            PreparedStatement statement = dbConnection.prepareStatement(createTableSQL);
+            statement.executeUpdate();
+            /*int a = 0;
+            int b = 10000;
+            for (int i = 0; i < 10; i++) {
+                int randomId = a + (int) (Math.random() * b);
+                int randomAmount = (i + 1) * b;
+                statement = dbConnection.prepareStatement("Insert into public.\"AccountsTest\" (\"accountId\", amount) " +
+                        "VALUES (" + randomId + "," + randomAmount + ")");
+                statement.executeUpdate();
+            }*/
+        } catch (PSQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public Integer findAccountInDb(int accountId) {
@@ -90,13 +81,14 @@ public class DbConnectController {
         return Integer.parseInt(amount);
     }
 
-    public void updateAccountInDb(int accountId, int finalAmount) throws UnknownAccountException, SQLException {
+    public void updateAccountInDb(int accountId, int finalAmount) throws SQLException {
         try {
             Connection dbConnection = getDBConnection();
             balanceUpdate = "UPDATE public.\"AccountsTest\" SET amount = " + finalAmount + " where \"accountId\" = " + accountId;
             PreparedStatement statement = dbConnection.prepareStatement(balanceUpdate);
-        /*statement.setString(1, String.valueOf(accountId));
-        statement.setString(2, String.valueOf(finalAmount));*/
+            //через statement пока не вышло
+            //statement.setString(1, String.valueOf((finalAmount)));
+            //statement.setString(2, String.valueOf(accountId));
             statement.executeUpdate();
         } catch (PSQLException e) {
             e.printStackTrace();
